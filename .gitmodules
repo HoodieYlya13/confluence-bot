@@ -1,0 +1,6 @@
+[submodule "mcp-confluence-documentation-rag"]
+	path = mcp-confluence-documentation-rag
+	url = git@github.com-HoodieYlya13:HoodieYlya13/mcp-confluence-documentation-rag.git
+[submodule "confluence-bot-app"]
+	path = confluence-bot-app
+	url = git@github.com-HoodieYlya13:HoodieYlya13/confluence-bot-app.git
