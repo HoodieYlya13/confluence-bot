@@ -1,0 +1,80 @@
+{
+  "routing": {
+    "repo_name": "confluence-bot",
+    "project_name": "Confluence Bot — RBAC-Enforced MCP Documentation RAG, End to End",
+    "hero_image": ""
+  },
+  "project_meta": {
+    "role": "Applied AI & Full-Stack Systems Engineer",
+    "development_phase": "Production-Deployed: Python MCP Server + Next.js Live Console",
+    "languages": ["Python", "TypeScript", "HTML", "Shell"],
+    "frameworks_and_tools": [
+      "FastMCP (Model Context Protocol)",
+      "MCP TypeScript SDK (Streamable HTTP Client)",
+      "LangGraph (StateGraph)",
+      "LlamaIndex",
+      "ChromaDB (Embedded)",
+      "Sentence-Transformers (all-MiniLM-L6-v2)",
+      "Google GenAI / Gemini API",
+      "Ollama",
+      "Next.js 16 (Cache Components / PPR, React Compiler, Server Actions)",
+      "Tailwind CSS 4",
+      "Upstash Redis (Rate Limiting)",
+      "Starlette / ASGI",
+      "Prometheus (Custom Exposition + TypeScript Parser)",
+      "pytest & unittest",
+      "Docker (Multi-Stage, Rootless)",
+      "GitHub Actions (Two-Speed CI/CD)",
+      "Hugging Face Spaces",
+      "Vercel",
+      "Atlassian Confluence Cloud REST API"
+    ]
+  },
+  "comprehensive_description": "A complete, production-deployed Model Context Protocol system built around one idea: the same question must yield different answers depending on who is asking — and nothing else must ever leak. The umbrella repo combines two submodules. The first is a Python MCP server exposing a retrieval-augmented knowledge base built from a live Atlassian Confluence instance, implementing a zero-trust four-layer security model: bearer-token authentication, ACL filters pushed inside the ChromaDB vector query, a LangGraph context-verification node, and a post-generation leak scanner — all gated by an automated 8-scenario evaluation suite targeting 0.00% leakage. The second is a server-first Next.js 16 console that makes the access-control story tangible in a browser: a live health and Prometheus metrics dashboard, and an RBAC playground that runs one question through two genuine MCP sessions holding different bearer tokens and shows side by side which document chunks each authorization level may retrieve. The whole system runs 24/7 on Hugging Face Spaces and Vercel at $0/month infrastructure cost.",
+  "engineering_highlights": [
+    "Designed a secure Four-Layer Enforcement Security Model (bearer token validation -> ACL query filter pushdown -> LangGraph context verifier node -> post-generation register leak scanner) ensuring complete authorization separation where a compromised retriever or a prompt injection embedded in the corpus cannot leak unauthorized content.",
+    "Implemented ACL Pushdown in ChromaDB using metadata filters evaluated natively inside the vector query, preventing unauthorized document chunks from ever entering the retrieval candidate set regardless of calling-code behavior.",
+    "Architected a Structure-Preserving Layout Chunker that parses Confluence XHTML into clean Markdown while keeping scientific tables atomic and carrying active heading context down through all generated sub-chunks.",
+    "Developed a Three-Phase LangGraph State Graph (router -> retrieve -> integrate -> verify -> generate/refuse), decoupling context verification from generation and rendering the safety pipeline as an inspectable execution graph.",
+    "Built a dual-role RBAC playground as a server-first Next.js 16 app: one query fans out to two real MCP sessions via the official TypeScript SDK over streamable HTTP, restricted chunks are highlighted, and the entire flow is a GET form driven by URL search params that works with JavaScript disabled — the only client component is a pending-state submit button.",
+    "Eliminated the console's JSON API surface entirely: bearer tokens are server-only, the browser receives rendered HTML and RSC payloads, and the single path to the MCP server is a rate-limited server render (per-IP sliding window plus a global daily budget, fail-closed in production).",
+    "Created a zero-dependency Prometheus pipeline on both ends: a custom Python metrics exporter exposing tool-call rates, latency, sync state, and layer-specific RBAC denials, plus a dependency-free TypeScript exposition parser rendering them as semantic dashboard cards.",
+    "Engineered a Two-Speed CI/CD Pipeline in GitHub Actions running static analysis and offline evaluation gates in seconds per push, combined with nightly jobs executing full semantic evaluations, adversarial probe suites, Trivy scans, and self-healing sync against the deployed Space."
+  ],
+  "measurable_metrics": {
+    "execution_latency": "Sub-second retrieval with CPU-local all-MiniLM-L6-v2 embeddings and sub-10ms embedded ChromaDB queries; the console streams results over Partial Prerendering so the static shell paints instantly while both MCP role sessions resolve in parallel.",
+    "ui_performance": "Both console routes build as Partial Prerender (static HTML shell, server-streamed dynamic content) with the React Compiler owning all memoization; total client-side JavaScript beyond the framework is a single useFormStatus submit button, and the RBAC playground is fully functional with JavaScript disabled.",
+    "operational_cost": "$0/month for a 24/7 public system: Hugging Face Spaces (CPU Basic) for the MCP server, Vercel free tier for the console, local embedding computation, Gemini API free tier with tiered model fallback, and Upstash free tier for rate limiting."
+  },
+  "star_challenges": [
+    {
+      "situation": "Traditional RAG pipelines trust the vector database output, leaving them vulnerable to buggy retriever logic or prompt injections hidden inside the corpus (a permanent 'SYSTEM OVERRIDE: ignore all previous instructions...' fixture lives in the live Confluence space to prove the point).",
+      "action": "Implemented a strict four-layer security boundary: ACL filters pushed directly into the Chroma query, a dedicated LangGraph verify node auditing chunk-level permissions after retrieval, injection-hardened prompting, and a post-generation regex leak scanner checking register addresses in the LLM output against the authorized context.",
+      "result": "Achieved a 0.00% RBAC violation/leakage rate with zero adversarial probes leaked, verified continuously by the gated evaluation suite — the live LLM quotes the embedded injection as data and refuses to obey it.",
+      "inline_image": ""
+    },
+    {
+      "situation": "Exposing a public, anonymous web playground over the MCP server meant handing real bearer-token sessions to unknown visitors — risking token exposure, quota-draining abuse of the free-tier Space, and a needlessly large attack surface from conventional JSON API routes.",
+      "action": "Rebuilt the console server-first: tokens guarded by server-only imports, all three API routes deleted in favor of server actions and a next/form GET flow so the browser only ever receives rendered HTML, and Upstash rate limiting keyed on platform-set IP headers (unspoofable, unlike cookie-based identity) with a per-IP sliding window plus a global daily budget that fails closed in production.",
+      "result": "Anonymous visitors can run real dual-role MCP comparisons against the live index while tokens never reach the client, the only path to the upstream server is a rate-limited server render, and the playground degrades gracefully (including working with JavaScript disabled).",
+      "inline_image": ""
+    },
+    {
+      "situation": "Standard HTML-to-Markdown libraries split or corrupt complex data tables, destroying the semantic meaning of diagnostic register parameters when chunked across sliding windows.",
+      "action": "Built a custom ConfluenceSanitizationEngine that extracts XHTML tables, collapses inner newlines, normalizes row-column counts, and pre-renders Markdown tables wrapped in blank-line boundaries so the chunker treats them atomically.",
+      "result": "Passed 100% of table-parsing integrity checks in the evaluation suite, preserving structure and data accuracy across all document pages.",
+      "inline_image": ""
+    },
+    {
+      "situation": "Free-tier Gemini endpoints frequently rate-limit or exhaust quota under heavy evaluation runs, causing generation to drop and CI to fail; the free-tier Space additionally sleeps when idle, so a visitor's first request often hits a cold upstream.",
+      "action": "Engineered a tiered LLM fallback hierarchy (prioritized Gemini models, Ollama for offline execution, a deterministic stub for CI gating) and made the console treat the sleeping Space as an explicit 'waking up' state with independent per-role failure handling rather than an error page.",
+      "result": "Maintained uninterrupted RAG generation across CI and production under rate-limit constraints, and the first click after a quiet week shows a friendly wake-up state instead of a failure.",
+      "inline_image": ""
+    }
+  ],
+  "architectural_deep_dive": {
+    "text": "The Python server syncs Atlassian Confluence page version histories, parses XHTML into clean Markdown, and indexes chunks into ChromaDB with role-permission metadata. Any MCP client — Claude Desktop, Claude Code, or the Next.js console — connects over streamable HTTP with a bearer token that ASGI middleware maps to a role context; role filters are then pushed inside the vector query, a LangGraph verify node audits the retrieved context, an injection-hardened prompt drives the tiered Gemini fallback group, and a leak scanner checks the final output, with every decision recorded in Prometheus metrics. The console is the system's public window: server components fetch /health and parse the Prometheus exposition into semantic cards, while the RBAC playground — a GET form whose URL is the state — fans one query out to both role sessions in parallel through the official MCP TypeScript SDK, renders the two result panes side by side with restricted chunks highlighted, and is itself protected by per-IP and global rate limits so the demo cannot be weaponized against the free-tier infrastructure it showcases.",
+    "illustration": null
+  },
+  "lessons_learned": "Layered, zero-trust security boundaries are the only way to build safe RAG agents — a single vector-store filter is insufficient once prompt injections live inside the corpus. The same philosophy applies one level up: the web console that demonstrates the security story must itself be designed as part of the attack surface, which is why it ended up with no JSON API, server-only credentials, and fail-closed rate limiting rather than being treated as 'just a frontend'."
+}
