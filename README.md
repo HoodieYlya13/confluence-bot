@@ -33,7 +33,7 @@ confluence-bot                             ← you are here (umbrella / showcase
 | Prometheus metrics | [`/metrics`](https://hoodieylya13-mcp-confluence-documentation-rag.hf.space/metrics) — tool calls, latency, RBAC denials by layer |
 | MCP endpoint | `https://hoodieylya13-mcp-confluence-documentation-rag.hf.space/mcp` — requires a bearer token; tokens map to roles **server-side** |
 
-The console's [RBAC playground](https://confluence-bot.hy13dev.com/playground) asks the same accelerator-operations question as `JUNIOR_OP` and as `ATS_CORE_LEAD` simultaneously, and highlights every chunk the document ACL filter withheld from the lower-privileged session — in real time, against the real index. (The free-tier Space sleeps when idle; the console treats "waking up" as a state, not an error.)
+The console's [RBAC playground](https://confluence-bot.hy13dev.com/playground) asks the same accelerator-operations question as `JUNIOR_OP` and as `ATS_CORE_LEAD` simultaneously, in two modes: **compare retrieval** highlights every chunk the document ACL filter withheld from the lower-privileged session, while **compare answers** runs the server-side LangGraph agent and contrasts the grounded answer each role receives — in real time, against the real index. (The free-tier Space sleeps when idle; the console treats "waking up" as a state, not an error.)
 
 ```bash
 claude mcp add --transport http accelerator-ops \
@@ -112,7 +112,7 @@ Latest live evaluation: **0.00% RBAC leakage · 0 adversarial probes leaked · 1
 A deliberately thin, security-conscious window over the live server — no MCP client required:
 
 - **Overview** — `/health` plus Prometheus exposition parsed server-side into semantic cards: indexed corpus, tool calls, RBAC denials *by enforcement layer*, latency, sync status.
-- **RBAC playground** — one query fans out to two genuine MCP sessions (official [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) over streamable HTTP, full initialize → tool-call → close handshake) holding different bearer tokens; chunks withheld from the junior operator are badged as restricted.
+- **RBAC playground** — one query fans out to two genuine MCP sessions (official [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) over streamable HTTP, full initialize → tool-call → close handshake) holding different bearer tokens, in two modes: **compare retrieval** badges the chunks withheld from the junior operator, while **compare answers** calls the server-side `ask` agent tool and contrasts the grounded answer each role receives.
 - **Server-first Next.js 16** — Cache Components / Partial Prerendering, React Compiler, server actions, and a `next/form` GET flow: the playground works with JavaScript disabled, and the only client component in the app is a pending-state submit button.
 - **No JSON API surface** — tokens are `server-only`, the browser receives rendered HTML, and the single path to the MCP server is guarded by Upstash rate limiting (per-IP sliding window + global daily budget, fail-closed in production).
 
