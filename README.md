@@ -58,14 +58,15 @@ flowchart LR
         role metadata")]
         MW["Bearer-token middleware
         token → role"]
-        TOOLS["MCP tools
+        TOOLS["Retrieval tools
         list · fetch · semantic_search"]
-        AGENT["LangGraph agent
+        AGENT["LangGraph agent · ask tool
         retrieve → verify → generate
         + leak scan"]
         OBS["/health · /metrics"]
         SYNC --> IDX
-        MW --> TOOLS
+        MW -->|raw tools · client reasons| TOOLS
+        MW -->|ask tool · server reasons| AGENT
         TOOLS -->|ACL filter inside the vector query| IDX
         AGENT --> TOOLS
     end
@@ -100,6 +101,7 @@ A zero-trust RAG pipeline over real Confluence content:
 - **Structure-preserving ingestion** — XHTML → Markdown with scientific tables kept atomic and heading context carried into every sub-chunk.
 - **ACL pushdown** — role filters are evaluated *inside* the ChromaDB vector query, so unauthorized chunks never enter the candidate set, no matter what the calling code does.
 - **Four-layer enforcement** — bearer auth → ACL pushdown → LangGraph context-verifier node → post-generation leak scanner. A compromised retriever or a prompt injection embedded in the corpus cannot leak restricted content. Full threat model in [SECURITY.md](https://github.com/HoodieYlya13/mcp-confluence-documentation-rag/blob/main/SECURITY.md).
+- **Two deployment modes, one server** — capable clients (Claude Desktop / Claude Code) call the raw retrieval tools and do their own reasoning (layers 1–2); thin or untrusted clients call the single `ask` tool, which runs the full LangGraph agent server-side so the verify gate and leak scanner (layers 3–4) are enforced regardless of caller. Identical RBAC either way.
 - **Gated evaluation suite** — 8 scenarios run in CI with exit-code gates: golden-set retrieval, adversarial probes (including a permanent prompt-injection fixture *inside the live corpus*), LLM-as-judge faithfulness, and a 0.00% leakage target.
 - **MLOps** — two-speed GitHub Actions (seconds-fast offline gates per push, full semantic + LLM pipeline nightly), Trivy scans, self-healing nightly sync, custom Prometheus exposition. Runs at **$0/month**.
 
