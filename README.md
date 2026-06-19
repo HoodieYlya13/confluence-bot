@@ -5,21 +5,25 @@
 [![Security](https://img.shields.io/badge/Security-4--layer%20RBAC-red)](https://github.com/HoodieYlya13/mcp-confluence-documentation-rag/blob/main/SECURITY.md)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![Tauri](https://img.shields.io/badge/Desktop-Tauri%202%20%C2%B7%20Rust-24C8DB)](https://tauri.app/)
 
 A complete, production-deployed **Model Context Protocol** system built around one idea: *the same question must yield different answers depending on who is asking — and nothing else must ever leak.*
 
 It spans the full stack of an applied-AI knowledge system:
 
 - a **Python MCP server** that turns a live Atlassian Confluence instance into an RBAC-enforced RAG substrate, secured by a four-layer enforcement model and gated by an automated evaluation suite — deployed 24/7 on Hugging Face Spaces;
-- a **Next.js 16 console** that lets anyone *experience* the access-control story in a browser — live health and metrics, plus a playground that asks one question through two real MCP sessions with different bearer tokens and shows, side by side, what each authorization level is allowed to retrieve.
+- a **Next.js 16 console** that lets anyone *experience* the access-control story in a browser — live health and metrics, plus a playground that asks one question through two real MCP sessions with different bearer tokens and shows, side by side, what each authorization level is allowed to retrieve;
+- a **Tauri desktop spotlight** (Rust) that summons a frameless command bar on a global hotkey, asks the server's agent in one keystroke, and returns a grounded answer with links straight to the source Confluence pages — the same RBAC-governed server, driven from a third language, with the bearer token held in the trusted process and never exposed to the webview.
 
 ```
 confluence-bot                             ← you are here (umbrella / showcase repo)
 ├── mcp-confluence-documentation-rag       Python MCP server — secure Confluence connector,
 │                                          LlamaIndex + ChromaDB retrieval with ACL pushdown,
 │                                          LangGraph agent, eval gates, Prometheus metrics
-└── confluence-bot-app                     Next.js 16 console — live health & metrics dashboard,
-                                           dual-role RBAC playground over MCP streamable HTTP
+├── confluence-bot-app                     Next.js 16 console — live health & metrics dashboard,
+│                                          dual-role RBAC playground over MCP streamable HTTP
+└── confluence-spotlight                   Tauri desktop spotlight (Rust) — global-hotkey command
+                                           bar, real rmcp client, token held server-side
 ```
 
 ---
@@ -84,10 +88,16 @@ flowchart LR
     CLIENT["Any MCP client
     Claude Desktop / Claude Code"]
 
+    SPOT["Spotlight desktop · Tauri (Rust)
+    global hotkey · rmcp client
+    token held in-process"]
+
     CONF --> SYNC
     CLIENT -->|"Authorization: Bearer …"| MW
     RL -->|"MCP TypeScript SDK
     streamable HTTP · server-side tokens"| MW
+    SPOT -->|"rmcp streamable HTTP
+    server-side role · ask tool"| MW
     OV --> OBS
 ```
 
@@ -116,6 +126,15 @@ A deliberately thin, security-conscious window over the live server — no MCP c
 - **Server-first Next.js 16** — Cache Components / Partial Prerendering, React Compiler, server actions, and a `next/form` GET flow: the playground works with JavaScript disabled, and the only client component in the app is a pending-state submit button.
 - **No JSON API surface** — tokens are `server-only`, the browser receives rendered HTML, and the single path to the MCP server is guarded by Upstash rate limiting (per-IP sliding window + global daily budget, fail-closed in production).
 
+## Half 3 — the desktop spotlight ([`confluence-spotlight`](https://github.com/HoodieYlya13/confluence-spotlight))
+
+A Tauri v2 desktop client that puts the assistant one keystroke away — and proves the security model holds outside the browser:
+
+- **Summon-on-hotkey UX** — a frameless, always-on-top, centered command bar (Raycast/Spotlight style) bound to a global shortcut (`Cmd+Shift+Space` by default); ask, read the grounded answer, click through to the Confluence page (opened in the system browser), Esc/blur to dismiss.
+- **Token never leaves the trusted process** — the bearer token lives only in Rust (`McpConfig::from_env`); the webview is a thin renderer that invokes one command and gets back rendered text. This is the desktop analog of the console's `server-only` tokens and of the server's own `STDIO_ROLE` model — the client never sends its own role.
+- **A real Rust MCP client** — the call uses the official [`rmcp`](https://crates.io/crates/rmcp) SDK over streamable HTTP (full initialize → `ask_accelerator_operations` → close), so one server is now exercised from clients in **three languages**.
+- **Single role with an honest badge** — runs as one configured clearance, shown in the bar; the same query as a different role is a second instance, not a hidden toggle.
+
 ---
 
 ## Run it yourself
@@ -138,7 +157,15 @@ cd confluence-bot-app
 bun install && cp .env.example .env.local && bun dev
 ```
 
-Each submodule's README has the full quickstart (live Confluence pipeline, Claude Desktop wiring, Vercel deployment).
+**Desktop spotlight:**
+
+```bash
+cd confluence-spotlight
+cp .env.example .env   # set SPOTLIGHT_TOKEN + MCP_SERVER_URL
+bun install && bun run tauri dev
+```
+
+Each submodule's README has the full quickstart (live Confluence pipeline, Claude Desktop wiring, Vercel deployment, the spotlight's GUI-free data-path probe).
 
 ---
 
@@ -151,5 +178,7 @@ Each submodule's README has the full quickstart (live Confluence pipeline, Claud
 | [server TAD.md](https://github.com/HoodieYlya13/mcp-confluence-documentation-rag/blob/main/TAD.md) | Every server design decision with rationale |
 | [console README](https://github.com/HoodieYlya13/confluence-bot-app#readme) | Console setup, environment variables, deployment |
 | [console TAD.md](https://github.com/HoodieYlya13/confluence-bot-app/blob/main/TAD.md) | Every console design decision with rationale |
+| [spotlight README](https://github.com/HoodieYlya13/confluence-spotlight#readme) | Desktop spotlight setup, env vars, hotkey, data-path probe |
+| [spotlight TAD.md](https://github.com/HoodieYlya13/confluence-spotlight/blob/main/TAD.md) | Every desktop design decision with rationale |
 
 House convention across the project: **no code comments or docstrings** — all design rationale lives in each repo's `TAD.md`.
