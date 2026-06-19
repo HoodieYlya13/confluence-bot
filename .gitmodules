@@ -4,3 +4,6 @@
 [submodule "confluence-bot-app"]
 	path = confluence-bot-app
 	url = https://github.com/HoodieYlya13/confluence-bot-app.git
+[submodule "confluence-spotlight"]
+	path = confluence-spotlight
+	url = https://github.com/HoodieYlya13/confluence-spotlight.git
