@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="confluence-bot" width="96" height="96" />
+</p>
+
 # 🌌 confluence-bot — RBAC-Enforced MCP Documentation RAG, End to End
 
 [![Live MCP server](https://img.shields.io/badge/Live-HF%20Spaces-yellow)](https://hoodieylya13-mcp-confluence-documentation-rag.hf.space/health)
@@ -131,9 +135,10 @@ A deliberately thin, security-conscious window over the live server — no MCP c
 A Tauri v2 desktop client that puts the assistant one keystroke away — and proves the security model holds outside the browser:
 
 - **Summon-on-hotkey UX** — a frameless, always-on-top, centered command bar (Raycast/Spotlight style) bound to a global shortcut (`Cmd+Shift+Space` by default); ask, read the grounded answer, click through to the Confluence page (opened in the system browser), Esc/blur to dismiss.
-- **Token never leaves the trusted process** — the bearer token lives only in Rust (`McpConfig::from_env`); the webview is a thin renderer that invokes one command and gets back rendered text. This is the desktop analog of the console's `server-only` tokens and of the server's own `STDIO_ROLE` model — the client never sends its own role.
+- **Token never leaves the trusted process** — sign-in is a deep-link **OAuth Authorization-Code + PKCE** round trip through the console, and the **Rust** process (never the webview) redeems the one-time code for the bearer token, which is then held in memory only. The shipped binary contains no secrets. This is the desktop analog of the console's `server-only` tokens and of the server's own `STDIO_ROLE` model — the client never sends its own role.
 - **A real Rust MCP client** — the call uses the official [`rmcp`](https://crates.io/crates/rmcp) SDK over streamable HTTP (full initialize → `ask_accelerator_operations` → close), so one server is now exercised from clients in **three languages**.
-- **Single role with an honest badge** — runs as one configured clearance, shown in the bar; the same query as a different role is a second instance, not a hidden toggle.
+- **Single role with an honest badge** — runs as one configured clearance, shown in the bar; the same query as a different role is a second sign-in, not a hidden toggle.
+- **Downloadable on every OS** — a GitHub Actions `tauri-action` matrix builds unsigned macOS (universal), Windows, and Linux installers per release tag; the macOS-only `NSPanel` overlay is `cfg`-gated behind a portable always-on-top-window fallback, so one codebase ships everywhere.
 
 ---
 
@@ -161,7 +166,7 @@ bun install && cp .env.example .env.local && bun dev
 
 ```bash
 cd confluence-spotlight
-cp .env.example .env   # set SPOTLIGHT_TOKEN + MCP_SERVER_URL
+cp .env.example .env   # set MCP_TOKEN_* for dev sign-in; URLs default to the live deploy
 bun install && bun run tauri dev
 ```
 
