@@ -146,6 +146,7 @@ A Tauri v2 desktop client that puts the assistant one keystroke away — and pro
 - **A real Rust MCP client** — the call uses the official [`rmcp`](https://crates.io/crates/rmcp) SDK over streamable HTTP (full initialize → `ask_accelerator_operations` → close), so one server is now exercised from clients in **three languages**.
 - **Role decided by identity, not a toggle** — in production the clearance comes from the signed-in account (shown as a badge in the bar); there is no role picker, and the access token is renewed in place via its refresh token. In dev the demo personas stand in. The MCP server accepts both token kinds and resolves the role itself.
 - **Downloadable on every OS** — a GitHub Actions `tauri-action` matrix builds unsigned macOS (universal), Windows, and Linux installers per release tag; the macOS-only `NSPanel` overlay is `cfg`-gated behind a portable always-on-top-window fallback, so one codebase ships everywhere.
+- **Self-updating** — installed apps update themselves over the GitHub releases feed (`tauri-plugin-updater`): a launch-time check surfaces an in-app **Update & restart** banner, and every downloaded build's signature is verified against a public key baked into the app, with the private signing key held only in CI.
 
 ---
 
