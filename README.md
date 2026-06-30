@@ -30,6 +30,10 @@ confluence-bot                             ← you are here (umbrella / showcase
                                            bar, real rmcp client, token held server-side
 ```
 
+<p align="center">
+  <video src="https://hy13dev.com/confluence-bot-spotlight.mp4" width="100%" autoplay loop muted playsinline></video>
+</p>
+
 ---
 
 ## Try it live
