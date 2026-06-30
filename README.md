@@ -31,7 +31,7 @@ confluence-bot                             ← you are here (umbrella / showcase
 ```
 
 <p align="center">
-  <video src="https://hy13dev.com/confluence-bot-spotlight.mp4" width="100%" autoplay loop muted playsinline></video>
+  <img src="confluence-spotlight/assets/confluence-bot-spotlight-short.gif" alt="confluence-bot-spotlight" width="100%" />
 </p>
 
 ---
