@@ -31,7 +31,7 @@ confluence-bot                             ← you are here (umbrella / showcase
 ```
 
 <p align="center">
-  <img src="confluence-spotlight/assets/confluence-bot-spotlight-short.gif" alt="confluence-bot-spotlight" width="100%" />
+  <img src="https://raw.githubusercontent.com/HoodieYlya13/confluence-spotlight/main/assets/confluence-bot-spotlight-short.gif" alt="confluence-bot-spotlight" width="100%" />
 </p>
 
 ---
